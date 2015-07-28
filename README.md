@@ -14,6 +14,9 @@ In your tool simply require easyLTI.php and then call connectLTI() to be returne
 Tool will automatically check for the nonce storage table and create if needed. Db structure can be added manually with LTI.sql.
 
 
+##Example Object that LTI Produces
+![alt text](https://github.com/kingmook/easyLTI/blob/master/ltiObjectExample.png "Image of example LTI object. Message me for this in an accessible format.")
+
 
 ##Acknowledgments
 
