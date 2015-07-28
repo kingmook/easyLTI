@@ -6,11 +6,13 @@
 require_once("../ims-blti/blti.php");
 
 //Bring in the LTI and DB info
-require_once("config.php");
+require_once("easyLTI/config.php");
 
 //connect to LTI | Returns LTI Data or FALSE
 function connectLTI()
 {
+    //Check if the LTI table exists and if it doesn't created it now
+    createTable('LTI');
 
     //Make the LTI connection | the Secret | Store as Session | Redirect after success
     $context = new BLTI($GLOBALS['ltiSecret'], true, false);
@@ -68,9 +70,8 @@ function secureLTI($nonce, $timestamp)
 function dbConnect()
 {
 
-    //PDO to the database
-    $db = new PDO('mysql:dbname=' . $GLOBALS['dbName'] . ';host=' . $GLOBALS['dbHost'] . ';charset=utf8',
-        $GLOBALS['dbUser'], $GLOBALS['dbPass']);
+    //PDO to the database set in config
+    $db = new PDO('mysql:dbname=' . $GLOBALS['dbName'] . ';host=' . $GLOBALS['dbHost'] . ';charset=utf8', $GLOBALS['dbUser'], $GLOBALS['dbPass']);
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -78,6 +79,34 @@ function dbConnect()
     return $db;
 }
 
+
+//LTI table doesn't exist to store nonces so create it if possible | Returns TRUE on create & FALSE if table already exists
+function createTable($tableName){
+
+    //Connect to the information_schema DB
+    $dbHandle = dbConnect();
+
+    //See if we can pull 1 record from the table to check it's existence
+    try {
+        $result = $dbHandle->query("SELECT 1 FROM ".$tableName." LIMIT 1");
+    } catch (Exception $e) {
+
+        //Otherwise create the table with specified name
+        $stmt = $dbHandle->prepare("CREATE TABLE IF NOT EXISTS `LTI` (
+          `nid` int(11) NOT NULL AUTO_INCREMENT,
+          `nonce` bigint(11) NOT NULL,
+          `timestamp` text NOT NULL,
+          PRIMARY KEY (`nid`),
+          UNIQUE KEY `nid` (`nid`)
+        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;");
+        $stmt->execute();
+
+        //Table created
+        return TRUE;
+    }
+    //No need to create the table as it already exists
+    return FALSE;
+}
 
 
 
