@@ -11,7 +11,7 @@ Change the config.php file to match your LTI Key and Secret as well as provide a
 
 In your tool simply require easyLTI.php and then call connectLTI() to be returned an oauth secured object of information passed from the LTI consumer. See exampleProvider.php for sample code.
 
-Db structure will be need to be added before this tool will function. You will need to import LTI.sql into your mySql DB.
+Tool will automatically check for the nonce storage table and create if needed. Db structure can be added manually with LTI.sql.
 
 
 
